@@ -6,6 +6,8 @@ Asisten todo di menu bar macOS. Catat tugas pakai bahasa sehari-hari, boleh dike
 
 Namanya diambil dari Hachiko, anjing yang setiap hari menunggu tepat pada jamnya.
 
+Hachi mengerti kalimat **bahasa Indonesia dan Inggris** tanpa perlu memilih bahasa dulu: tiap kalimat dibaca dengan keduanya, lalu dipakai yang paling banyak mengenali bagian waktunya.
+
 ## Pasang
 
 Butuh macOS 26 atau lebih baru, di Mac Apple silicon.
@@ -23,7 +25,7 @@ Tampilan Hachi mengikuti bahasa Mac (Inggris atau Indonesia). Kalau ingin bahasa
 
 1. Buka **Hachi** dari folder Applications. Ikon kepala Shiba muncul di menu bar.
 2. Klik **Allow / Izinkan** saat macOS meminta izin notifikasi. Tanpa izin ini, pengingat tidak akan muncul.
-3. Saat pertama memakai suara, izinkan **Mikrofon**. Model suara bahasa Indonesia diunduh sekali (butuh internet sebentar). Setelah itu suara jalan offline.
+3. Saat pertama memakai suara, izinkan **Mikrofon**. Model suara diunduh sekali (butuh internet sebentar). Setelah itu suara jalan offline.
 4. Aplikasi otomatis menyala tiap login. Bisa dimatikan di Pengaturan.
 
 ## Mencatat tugas
@@ -57,6 +59,10 @@ Aturan singkat:
 - `jam 1`–`jam 6` tanpa pagi/sore dianggap siang/sore. `jam 7`–`jam 11` dianggap pagi; kalau jam itu sudah lewat hari ini, dipakai malamnya.
 - `pagi` 08.00, `siang` 12.00, `sore` 16.00, `malam` 20.00 (bisa diubah di Pengaturan).
 - Tugas **seharian** (tanpa jam) tidak berbunyi sendiri, cukup masuk ringkasan pagi. Kalau tetap mau diingatkan, tulis `ingetin` atau pilih di form.
+
+Kalimat bahasa Inggris juga dimengerti, misalnya `tomorrow 3pm call client remind me 30 minutes before`, `every monday and thursday 9am gym`, atau `next friday deadline proposal`. Contoh lengkapnya ada di [README bahasa Inggris](README.md#example-sentences).
+
+Input suara mendengarkan dalam bahasa tampilan Hachi. Kalau ingin bicara dalam bahasa lain, ganti di **Pengaturan → Bahasa suara**.
 
 ## Panel menu bar
 
