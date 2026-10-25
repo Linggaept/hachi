@@ -17,6 +17,8 @@ Butuh macOS 26 atau lebih baru, di Mac Apple silicon.
 
 Hachi harus berada di folder Applications supaya bisa menyala otomatis saat login.
 
+Tampilan Hachi mengikuti bahasa Mac (Inggris atau Indonesia). Kalau bahasa Mac-mu Inggris tapi ingin Hachi berbahasa Indonesia, buka **Pengaturan Sistem → Umum → Bahasa & Wilayah → Aplikasi**, tambahkan Hachi, lalu pilih Bahasa Indonesia.
+
 ## Pertama kali
 
 1. Buka **Hachi** dari folder Applications. Ikon kepala Shiba muncul di menu bar.
@@ -95,6 +97,8 @@ swift test               # test parser bahasa Indonesia
 Setelah build ulang, macOS kadang meminta izin mikrofon/notifikasi lagi karena tanda tangan aplikasinya ad-hoc.
 
 Parser ada di target `TodoParser` dan bisa dites tanpa membuka app. Pola kalimat baru selalu disertai test di `Tests/TodoParserTests`.
+
+Teks tampilan ditulis dalam bahasa Inggris di kode dan diterjemahkan di `Resources/<bahasa>.lproj/Localizable.strings`. Setelah mengubah teks, jalankan `./scripts/check-translations.py` untuk menemukan terjemahan yang kurang atau sudah tidak dipakai.
 
 ## Kalau ada masalah
 

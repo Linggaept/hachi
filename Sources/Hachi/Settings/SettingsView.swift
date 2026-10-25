@@ -20,53 +20,53 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
-            Section("Umum") {
-                Toggle("Nyalakan saat login", isOn: $state.launchAtLogin)
+            Section("General") {
+                Toggle("Open at login", isOn: $state.launchAtLogin)
                     .onChange(of: state.launchAtLogin) { _, on in setLaunchAtLogin(on) }
                 if let loginError = state.loginError {
                     Text(loginError).font(.caption).foregroundStyle(.orange)
                 }
-                Picker("Shortcut catat cepat", selection: $settings.hotkey) {
-                    ForEach(HotkeyChoice.allCases) { Text($0.label).tag($0) }
+                Picker("Quick capture shortcut", selection: $settings.hotkey) {
+                    ForEach(HotkeyChoice.allCases) { Text(verbatim: $0.label).tag($0) }
                 }
-                Text("Tekan untuk mencatat, tahan untuk bicara.")
+                Text("Press to add a task, hold to speak.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
 
-            Section("Ringkasan pagi") {
-                Toggle("Kirim ringkasan sekali sehari", isOn: $settings.briefingEnabled)
-                Picker("Mulai dari jam", selection: $settings.briefingHour) {
-                    ForEach(0..<12, id: \.self) { Text(String(format: "%02d.00", $0)).tag($0) }
+            Section("Morning summary") {
+                Toggle("Send a summary once a day", isOn: $settings.briefingEnabled)
+                Picker("Starting from", selection: $settings.briefingHour) {
+                    ForEach(0..<12, id: \.self) { Text(verbatim: Formatting.hour($0)).tag($0) }
                 }
                 .disabled(!settings.briefingEnabled)
-                Toggle("Tanyakan tugas tanpa tanggal yang \(TaskStore.staleDays) hari tidak disentuh", isOn: $settings.nudgeEnabled)
-                Button("Kirim ringkasan sekarang") { briefing.sendBriefing() }
+                Toggle("Ask about undated tasks untouched for \(TaskStore.staleDays) days", isOn: $settings.nudgeEnabled)
+                Button("Send summary now") { briefing.sendBriefing() }
             }
 
             Section {
-                hourPicker("Pagi", $settings.morningHour, 4..<12)
-                hourPicker("Siang", $settings.noonHour, 10..<15)
-                hourPicker("Sore", $settings.afternoonHour, 14..<19)
-                hourPicker("Malam", $settings.eveningHour, 18..<24)
+                hourPicker("Morning (pagi)", $settings.morningHour, 4..<12)
+                hourPicker("Midday (siang)", $settings.noonHour, 10..<15)
+                hourPicker("Afternoon (sore)", $settings.afternoonHour, 14..<19)
+                hourPicker("Evening (malam)", $settings.eveningHour, 18..<24)
             } header: {
-                Text("Jam bagian hari")
+                Text("Parts of the day")
             } footer: {
-                Text("Dipakai saat kalimat hanya menyebut \"besok pagi\", \"nanti malam\", dst. Pengingat tugas seharian memakai jam pagi.")
+                Text("Used when a sentence only says \"besok pagi\", \"nanti malam\", and so on. All-day task reminders use the morning time.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
 
-            Section("Izin") {
+            Section("Permissions") {
                 if state.notificationsDenied {
-                    Label("Notifikasi dimatikan, jadi pengingat tidak akan muncul.", systemImage: "exclamationmark.triangle")
+                    Label("Notifications are off, so reminders won't appear.", systemImage: "exclamationmark.triangle")
                         .foregroundStyle(.orange)
                 } else {
-                    Label("Notifikasi menyala", systemImage: "checkmark.circle").foregroundStyle(.secondary)
+                    Label("Notifications are on", systemImage: "checkmark.circle").foregroundStyle(.secondary)
                 }
                 HStack {
-                    Button("Pengaturan Notifikasi…") { open("x-apple.systempreferences:com.apple.Notifications-Settings.extension") }
-                    Button("Mikrofon…") { open("x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone") }
+                    Button("Notification Settings…") { open("x-apple.systempreferences:com.apple.Notifications-Settings.extension") }
+                    Button("Microphone…") { open("x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone") }
                 }
             }
 
@@ -76,9 +76,9 @@ struct SettingsView: View {
                     .foregroundStyle(.secondary)
                     .textSelection(.enabled)
                 HStack {
-                    Button("Ekspor…", action: exportData)
-                    Button("Impor…", action: importData)
-                    Button("Tampilkan di Finder") {
+                    Button("Export…", action: exportData)
+                    Button("Import…", action: importData)
+                    Button("Show in Finder") {
                         NSWorkspace.shared.activateFileViewerSelecting([TaskStore.databaseURL])
                     }
                 }
@@ -92,9 +92,9 @@ struct SettingsView: View {
         .task { state.notificationsDenied = await scheduler.authorizationDenied() }
     }
 
-    private func hourPicker(_ label: String, _ value: Binding<Int>, _ range: Range<Int>) -> some View {
+    private func hourPicker(_ label: LocalizedStringKey, _ value: Binding<Int>, _ range: Range<Int>) -> some View {
         Picker(label, selection: value) {
-            ForEach(range, id: \.self) { Text(String(format: "%02d.00", $0)).tag($0) }
+            ForEach(range, id: \.self) { Text(verbatim: Formatting.hour($0)).tag($0) }
         }
     }
 
@@ -107,7 +107,7 @@ struct SettingsView: View {
             }
             state.loginError = nil
         } catch {
-            state.loginError = "Gagal: \(error.localizedDescription). Pastikan aplikasi ada di folder Applications."
+            state.loginError = String(localized: "Failed: \(error.localizedDescription). Make sure Hachi is in the Applications folder.")
         }
         state.launchAtLogin = SMAppService.mainApp.status == .enabled
     }
@@ -123,9 +123,9 @@ struct SettingsView: View {
         guard panel.runModal() == .OK, let url = panel.url else { return }
         do {
             try store.exportJSON().write(to: url, options: .atomic)
-            state.dataMessage = "Tersimpan di \(url.lastPathComponent)."
+            state.dataMessage = String(localized: "Saved to \(url.lastPathComponent).")
         } catch {
-            state.dataMessage = "Ekspor gagal: \(error.localizedDescription)"
+            state.dataMessage = String(localized: "Export failed: \(error.localizedDescription)")
         }
     }
 
@@ -135,9 +135,9 @@ struct SettingsView: View {
         guard panel.runModal() == .OK, let url = panel.url else { return }
         do {
             let added = try store.importJSON(Data(contentsOf: url))
-            state.dataMessage = "\(added) tugas ditambahkan."
+            state.dataMessage = String(localized: "Tasks added: \(added)")
         } catch {
-            state.dataMessage = "Impor gagal: berkas bukan hasil ekspor Hachi."
+            state.dataMessage = String(localized: "Import failed: this file isn't a Hachi export.")
         }
     }
 }
@@ -153,8 +153,8 @@ final class SettingsWindowController {
 
     func show() {
         if window == nil {
-            let window = NSWindow(contentViewController: NSHostingController(rootView: makeView()))
-            window.title = "Pengaturan Hachi"
+            let window = NSWindow(contentViewController: NSHostingController(rootView: makeView().environment(\.locale, Formatting.locale)))
+            window.title = String(localized: "Hachi Settings")
             window.styleMask = [.titled, .closable]
             window.isReleasedWhenClosed = false
             window.center()

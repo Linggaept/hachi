@@ -11,10 +11,12 @@ struct TaskFormView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text(model.editingID == nil ? "Tugas baru" : "Ubah tugas")
-                .font(.headline)
+            Group {
+                if model.editingID == nil { Text("New task") } else { Text("Edit task") }
+            }
+            .font(.headline)
 
-            TextField("Judul", text: $model.draft.title)
+            TextField("Title", text: $model.draft.title)
                 .textFieldStyle(.roundedBorder)
                 .font(.title3)
                 .focused($titleFocused)
@@ -22,33 +24,33 @@ struct TaskFormView: View {
 
             Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 10) {
                 GridRow {
-                    Text("Tanggal").foregroundStyle(.secondary)
+                    Text("Date").foregroundStyle(.secondary)
                     HStack {
-                        Toggle("Pakai tanggal", isOn: hasDue).toggleStyle(.checkbox)
+                        Toggle("Has a date", isOn: hasDue).toggleStyle(.checkbox)
                         if model.draft.due != nil {
                             DatePicker("", selection: due, displayedComponents: model.draft.allDay ? [.date] : [.date, .hourAndMinute])
                                 .labelsHidden()
                                 .datePickerStyle(.field)
-                            Toggle("Seharian", isOn: allDay).toggleStyle(.checkbox)
+                            Toggle("All day", isOn: allDay).toggleStyle(.checkbox)
                         }
                     }
                 }
                 if model.draft.due != nil {
                     GridRow {
-                        Text("Pengingat").foregroundStyle(.secondary)
+                        Text("Reminder").foregroundStyle(.secondary)
                         Picker("", selection: $model.draft.remindOffset) {
                             ForEach(reminderOptions, id: \.self) { option in
-                                Text(reminderLabel(option)).tag(option)
+                                Text(verbatim: reminderLabel(option)).tag(option)
                             }
                         }
                         .labelsHidden()
                         .frame(maxWidth: 260)
                     }
                     GridRow {
-                        Text("Ulangi").foregroundStyle(.secondary)
+                        Text("Repeat").foregroundStyle(.secondary)
                         Picker("", selection: $model.draft.rule) {
                             ForEach(ruleOptions, id: \.self) { option in
-                                Text(option?.label ?? "Tidak").tag(option)
+                                Text(verbatim: option.map(Formatting.repeatLabel) ?? String(localized: "Never")).tag(option)
                             }
                         }
                         .labelsHidden()
@@ -56,8 +58,8 @@ struct TaskFormView: View {
                     }
                 }
                 GridRow(alignment: .top) {
-                    Text("Catatan").foregroundStyle(.secondary)
-                    TextField("Opsional", text: $model.draft.notes, axis: .vertical)
+                    Text("Notes").foregroundStyle(.secondary)
+                    TextField("Optional", text: $model.draft.notes, axis: .vertical)
                         .textFieldStyle(.roundedBorder)
                         .lineLimit(2...5)
                 }
@@ -67,17 +69,17 @@ struct TaskFormView: View {
                 if model.editingID != nil {
                     // Konfirmasi di tempat: dialog terpisah membuat panel kehilangan fokus dan tertutup.
                     if model.confirmDelete {
-                        Button("Yakin hapus?", role: .destructive) { model.delete() }
+                        Button("Delete for sure?", role: .destructive) { model.delete() }
                             .foregroundStyle(.red)
-                        Button("Tidak") { model.confirmDelete = false }
+                        Button("No") { model.confirmDelete = false }
                     } else {
-                        Button("Hapus", role: .destructive) { model.confirmDelete = true }
+                        Button("Delete", role: .destructive) { model.confirmDelete = true }
                     }
                 }
                 Spacer()
-                Button("Batal") { model.close() }
+                Button("Cancel") { model.close() }
                     .keyboardShortcut(.cancelAction)
-                Button("Simpan") { model.save() }
+                Button("Save") { model.save() }
                     .keyboardShortcut(.defaultAction)
                     .disabled(!model.canSave)
             }
@@ -142,8 +144,8 @@ struct TaskFormView: View {
     private func reminderLabel(_ offset: Double?) -> String {
         if model.draft.allDay {
             switch offset {
-            case nil: return "Cukup di ringkasan pagi"
-            case 0: return "Jam \(model.settings.morningHour).00 hari itu"
+            case nil: return String(localized: "Only in the morning summary")
+            case 0: return String(localized: "At \(Formatting.hour(model.settings.morningHour)) that day")
             default: return Formatting.offsetLabel(offset)
             }
         }

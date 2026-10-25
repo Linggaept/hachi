@@ -34,7 +34,7 @@ final class CapturePanelController: NSObject, NSWindowDelegate {
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .transient]
         panel.delegate = self
 
-        let host = NSHostingController(rootView: CaptureView(model: model, store: store))
+        let host = NSHostingController(rootView: CaptureView(model: model, store: store).environment(\.locale, Formatting.locale))
         host.sizingOptions = [.preferredContentSize]
         host.view.wantsLayer = true
         host.view.layer?.backgroundColor = .clear

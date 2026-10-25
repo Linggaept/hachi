@@ -38,6 +38,7 @@ final class StatusBarController: NSObject {
         popover.animates = false
         popover.contentViewController = NSHostingController(
             rootView: MenuPanelView(store: store, settings: settings, state: state, actions: wrapped)
+                .environment(\.locale, Formatting.locale)
         )
 
         if let button = item.button {
@@ -57,7 +58,7 @@ final class StatusBarController: NSObject {
     private func refreshBadge() {
         let overdue = store.overdue.count
         item.button?.title = overdue > 0 ? " \(overdue)" : ""
-        item.button?.toolTip = overdue > 0 ? "\(overdue) tugas terlambat" : "Hachi"
+        item.button?.toolTip = overdue > 0 ? String(localized: "Overdue: \(overdue)") : "Hachi"
     }
 
     @objc private func toggle() {

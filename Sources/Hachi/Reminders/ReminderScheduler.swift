@@ -29,15 +29,15 @@ final class ReminderScheduler: NSObject, UNUserNotificationCenterDelegate {
         center.delegate = self
         center.setNotificationCategories([
             UNNotificationCategory(identifier: Category.task.rawValue, actions: [
-                UNNotificationAction(identifier: Action.done.rawValue, title: "Selesai"),
-                UNNotificationAction(identifier: Action.snooze10.rawValue, title: "Tunda 10 menit"),
-                UNNotificationAction(identifier: Action.snooze60.rawValue, title: "Tunda 1 jam"),
-                UNNotificationAction(identifier: Action.tomorrow.rawValue, title: "Besok"),
+                UNNotificationAction(identifier: Action.done.rawValue, title: String(localized: "Done")),
+                UNNotificationAction(identifier: Action.snooze10.rawValue, title: String(localized: "Snooze 10 min")),
+                UNNotificationAction(identifier: Action.snooze60.rawValue, title: String(localized: "Snooze 1 hour")),
+                UNNotificationAction(identifier: Action.tomorrow.rawValue, title: String(localized: "Tomorrow")),
             ], intentIdentifiers: []),
             UNNotificationCategory(identifier: Category.nudge.rawValue, actions: [
-                UNNotificationAction(identifier: Action.keep.rawValue, title: "Masih"),
-                UNNotificationAction(identifier: Action.done.rawValue, title: "Sudah selesai"),
-                UNNotificationAction(identifier: Action.delete.rawValue, title: "Hapus", options: [.destructive]),
+                UNNotificationAction(identifier: Action.keep.rawValue, title: String(localized: "Still on it")),
+                UNNotificationAction(identifier: Action.done.rawValue, title: String(localized: "Already done")),
+                UNNotificationAction(identifier: Action.delete.rawValue, title: String(localized: "Delete"), options: [.destructive]),
             ], intentIdentifiers: []),
             UNNotificationCategory(identifier: Category.briefing.rawValue, actions: [], intentIdentifiers: []),
         ])

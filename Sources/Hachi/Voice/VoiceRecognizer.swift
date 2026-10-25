@@ -44,10 +44,10 @@ final class VoiceRecognizer: ObservableObject {
         finalized = ""
         volatile = ""
         transcript = ""
-        state = .preparing("Menyiapkan mikrofon…")
+        state = .preparing(String(localized: "Getting the microphone ready…"))
 
         guard await Self.microphoneAllowed() else {
-            state = .failed("Izin mikrofon ditolak. Buka Pengaturan Sistem → Privasi & Keamanan → Mikrofon.")
+            state = .failed(String(localized: "Microphone access was denied. Open System Settings → Privacy & Security → Microphone."))
             return
         }
         do {
@@ -59,7 +59,7 @@ final class VoiceRecognizer: ObservableObject {
                 try await startServer()
             } catch {
                 stopEngine()
-                state = .failed("Pengenal suara tidak tersedia: \(error.localizedDescription)")
+                state = .failed(String(localized: "Speech recognition isn't available: \(error.localizedDescription)"))
                 return
             }
         }
@@ -113,11 +113,11 @@ final class VoiceRecognizer: ObservableObject {
     private func startOnDevice() async throws {
         let transcriber = DictationTranscriber(locale: locale, preset: .progressiveShortDictation)
         if let install = try await AssetInventory.assetInstallationRequest(supporting: [transcriber]) {
-            state = .preparing("Mengunduh model suara bahasa Indonesia (sekali saja)…")
+            state = .preparing(String(localized: "Downloading the Indonesian speech model (one time only)…"))
             try await install.downloadAndInstall()
         }
         guard let format = await SpeechAnalyzer.bestAvailableAudioFormat(compatibleWith: [transcriber]) else {
-            throw VoiceError("Format audio tidak didukung")
+            throw VoiceError(String(localized: "Unsupported audio format"))
         }
         let analyzer = SpeechAnalyzer(modules: [transcriber])
         let (stream, continuation) = AsyncStream.makeStream(of: AnalyzerInput.self)
@@ -149,10 +149,10 @@ final class VoiceRecognizer: ObservableObject {
     private func startServer() async throws {
         let status = await Self.speechAuthorization()
         guard status == .authorized else {
-            throw VoiceError("izin Pengenalan Ucapan ditolak (Pengaturan Sistem → Privasi & Keamanan → Pengenalan Ucapan)")
+            throw VoiceError(String(localized: "Speech Recognition access was denied (System Settings → Privacy & Security → Speech Recognition)"))
         }
         guard let recognizer = SFSpeechRecognizer(locale: locale), recognizer.isAvailable else {
-            throw VoiceError("butuh koneksi internet")
+            throw VoiceError(String(localized: "an internet connection is needed"))
         }
         let request = SFSpeechAudioBufferRecognitionRequest()
         request.shouldReportPartialResults = true
@@ -235,7 +235,7 @@ final class VoiceRecognizer: ObservableObject {
     ) throws {
         let node = engine.inputNode
         let source = node.outputFormat(forBus: 0)
-        guard source.sampleRate > 0 else { throw VoiceError("Mikrofon tidak ditemukan") }
+        guard source.sampleRate > 0 else { throw VoiceError(String(localized: "No microphone found")) }
         let converter = target.flatMap { $0 == source ? nil : AVAudioConverter(from: source, to: $0) }
 
         node.installTap(onBus: 0, bufferSize: 4096, format: source) { buffer, _ in

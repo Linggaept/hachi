@@ -29,7 +29,7 @@ struct CaptureView: View {
                 Image(systemName: "checklist")
                     .font(.system(size: 20, weight: .medium))
                     .foregroundStyle(.secondary)
-                TextField("Catat tugas… mis. besok jam 3 sore call client", text: $model.text)
+                TextField("Add a task… e.g. besok jam 3 sore call client", text: $model.text)
                     .textFieldStyle(.plain)
                     .font(.system(size: 20))
                     .focused($focused)
@@ -73,7 +73,7 @@ struct CaptureView: View {
                 .symbolEffect(.pulse, isActive: model.voice.state == .listening)
         }
         .buttonStyle(.plain)
-        .help("Bicara (atau tahan shortcut)")
+        .help("Speak (or hold the shortcut)")
     }
 
     private var voiceStatus: AnyView? {
@@ -84,7 +84,7 @@ struct CaptureView: View {
             return AnyView(Label(message, systemImage: "hourglass").font(.callout).foregroundStyle(.secondary))
         case .listening:
             return AnyView(
-                Label("Mendengarkan… lepas shortcut atau klik ⏹ kalau sudah", systemImage: "waveform")
+                Label("Listening… release the shortcut or click ⏹ when done", systemImage: "waveform")
                     .font(.callout)
                     .foregroundStyle(.red)
             )
@@ -104,10 +104,10 @@ struct CaptureView: View {
                     Chip(icon: "calendar", text: Formatting.longDue(due, allDay: parsed.allDay, now: store.now))
                     Chip(icon: "bell", text: reminderText(parsed, due: due))
                 } else {
-                    Chip(icon: "tray", text: "Tanpa tanggal")
+                    Chip(icon: "tray", text: String(localized: "No date"))
                 }
                 if let rule = parsed.repeatRule {
-                    Chip(icon: "repeat", text: rule.label)
+                    Chip(icon: "repeat", text: Formatting.repeatLabel(rule))
                 }
             }
         }
@@ -115,23 +115,24 @@ struct CaptureView: View {
     }
 
     private func reminderText(_ parsed: ParsedTask, due: Date) -> String {
-        guard let offset = parsed.remindOffset else { return "Masuk ringkasan pagi" }
-        guard let at = store.reminderDate(due: due, allDay: parsed.allDay, offset: offset) else { return "Tanpa pengingat" }
-        if offset == 0, !parsed.allDay { return "Tepat waktu" }
-        return "Ingatkan " + (Calendar.current.isDate(at, inSameDayAs: due)
+        guard let offset = parsed.remindOffset else { return String(localized: "In the morning summary") }
+        guard let at = store.reminderDate(due: due, allDay: parsed.allDay, offset: offset) else { return String(localized: "No reminder") }
+        if offset == 0, !parsed.allDay { return String(localized: "On time") }
+        let when = Calendar.current.isDate(at, inSameDayAs: due)
             ? Formatting.clock(at)
-            : Formatting.longDue(at, allDay: false, now: store.now))
+            : Formatting.longDue(at, allDay: false, now: store.now)
+        return String(localized: "Remind \(when)")
     }
 
     private var hints: some View {
         HStack(spacing: 14) {
-            Hint(key: "↩", text: "Simpan")
-            Button("⌘↩ Atur detail") { model.openForm() }
+            Hint(key: "↩", text: "Save")
+            Button("⌘↩ Set details") { model.openForm() }
                 .buttonStyle(.plain)
                 .keyboardShortcut(.return, modifiers: .command)
-            Hint(key: "esc", text: "Batal")
+            Hint(key: "esc", text: "Cancel")
             Spacer()
-            Text("Tahan \(model.settings.hotkey.label) untuk bicara")
+            Text("Hold \(model.settings.hotkey.label) to speak")
         }
         .font(.caption)
         .foregroundStyle(.secondary)
@@ -153,9 +154,12 @@ struct Chip: View {
 
 private struct Hint: View {
     let key: String
-    let text: String
+    let text: LocalizedStringKey
 
     var body: some View {
-        Text("\(key) \(text)")
+        HStack(spacing: 4) {
+            Text(verbatim: key)
+            Text(text)
+        }
     }
 }

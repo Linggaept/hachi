@@ -41,26 +41,8 @@ public enum RepeatRule: Equatable, Hashable, Sendable {
         }
     }
 
-    // MARK: Label
-
-    public static let weekdayNames = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"]
-
-    public var label: String {
-        switch self {
-        case .daily(1): return "Tiap hari"
-        case .daily(let every): return "Tiap \(every) hari"
-        case .weekly(_, let days) where days.sorted() == Self.workdays: return "Tiap hari kerja"
-        case .weekly(let every, let days) where days.isEmpty:
-            return every == 1 ? "Tiap minggu" : "Tiap \(every) minggu"
-        case .weekly(_, let days):
-            let names = Self.mondayFirst(days).map { Self.weekdayNames[$0 - 1] }
-            return "Tiap " + names.joined(separator: " & ")
-        case .monthly(let day): return "Tiap tanggal \(day)"
-        case .yearly: return "Tiap tahun"
-        }
-    }
-
-    static func mondayFirst(_ days: [Int]) -> [Int] {
+    /// Hari diurutkan mulai Senin, untuk label.
+    public static func mondayFirst(_ days: [Int]) -> [Int] {
         days.sorted { ($0 + 5) % 7 < ($1 + 5) % 7 }
     }
 

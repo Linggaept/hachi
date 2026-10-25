@@ -404,9 +404,8 @@ private func parse(_ text: String, now: Date = friday10) -> ParsedTask {
     }
 }
 
-@Test func labelAturan() {
-    #expect(RepeatRule.daily(every: 1).label == "Tiap hari")
-    #expect(RepeatRule.weekly(every: 1, weekdays: [2, 5]).label == "Tiap Senin & Kamis")
-    #expect(RepeatRule.weekly(every: 1, weekdays: [2, 3, 4, 5, 6]).label == "Tiap hari kerja")
-    #expect(RepeatRule.monthly(day: 1).label == "Tiap tanggal 1")
+// Label aturan berulang kini dibuat app (Formatting.repeatLabel) dalam bahasa tampilan; di sini cukup urutan harinya.
+@Test func urutanHariMulaiSenin() {
+    #expect(RepeatRule.mondayFirst([1, 5, 2]) == [2, 5, 1])
+    #expect(RepeatRule.mondayFirst([7, 1, 3]) == [3, 7, 1])
 }

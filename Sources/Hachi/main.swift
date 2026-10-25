@@ -27,7 +27,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             store = try TaskStore(settings: settings)
         } catch {
             let alert = NSAlert()
-            alert.messageText = "Hachi tidak bisa membuka database"
+            alert.messageText = String(localized: "Hachi can't open its database")
             alert.informativeText = "\(error)"
             alert.runModal()
             NSApp.terminate(nil)

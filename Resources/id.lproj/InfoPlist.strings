@@ -1,0 +1,4 @@
+/* Teks izin macOS dalam bahasa Indonesia. */
+
+"NSMicrophoneUsageDescription" = "Dipakai saat kamu mencatat tugas dengan suara.";
+"NSSpeechRecognitionUsageDescription" = "Mengubah ucapanmu menjadi teks tugas.";

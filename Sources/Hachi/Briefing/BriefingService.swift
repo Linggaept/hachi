@@ -63,8 +63,8 @@ final class BriefingService {
             store.markNudged(stale.id)
             scheduler.sendNow(
                 id: "nudge-\(stale.id)",
-                title: "Masih mau dikerjakan?",
-                body: "\(stale.title) · dicatat \(Formatting.duration(now.timeIntervalSince(stale.createdAt))) lalu",
+                title: String(localized: "Still want to do this?"),
+                body: String(localized: "\(stale.title) · added \(Formatting.duration(now.timeIntervalSince(stale.createdAt))) ago"),
                 category: .nudge,
                 taskID: stale.id
             )
@@ -76,12 +76,12 @@ final class BriefingService {
         let today = store.today.count
         let overdue = store.overdue.count
         var parts: [String] = []
-        parts.append(today == 0 ? "Tidak ada tugas hari ini" : "Hari ini \(today) tugas")
-        if overdue > 0 { parts.append("\(overdue) terlambat") }
-        let first = (store.overdue + store.today).first.map { "Pertama: \($0.title)" }
+        parts.append(today == 0 ? String(localized: "No tasks today") : String(localized: "Tasks today: \(today)"))
+        if overdue > 0 { parts.append(String(localized: "Overdue: \(overdue)")) }
+        let first = (store.overdue + store.today).first.map { String(localized: "First up: \($0.title)") }
         scheduler.sendNow(
             id: "briefing-\(Self.dayKey.string(from: now))",
-            title: "Selamat pagi",
+            title: String(localized: "Good morning"),
             body: ([parts.joined(separator: " · ")] + [first].compactMap { $0 }).joined(separator: "\n"),
             category: .briefing
         )

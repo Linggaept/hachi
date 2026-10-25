@@ -9,7 +9,7 @@ No AI, no account, no server. Everything stays on your Mac.
 Named after Hachiko, the dog who waited at the station at the same time every day.
 
 > [!NOTE]
-> **Indonesian first.** Hachi currently understands sentences in Indonesian, and the app itself is in Indonesian. An English interface and an English sentence parser are being worked on.
+> **Indonesian first.** The app is available in English and Indonesian and follows your Mac's language. The sentences you type or say are currently understood in Indonesian only; an English sentence parser is being worked on.
 
 ## Why Hachi
 
@@ -32,6 +32,8 @@ Requires macOS 26 or later on Apple silicon.
 3. Allow notifications when asked. The first time you use voice, allow the microphone; the Indonesian speech model downloads once, then works offline.
 
 Hachi starts automatically at login. You can turn this off in Settings. Hachi has to be in the Applications folder for this to work.
+
+The interface follows your Mac's language (English or Indonesian). To use a different language for Hachi only, go to **System Settings → General → Language & Region → Applications**.
 
 ## Using Hachi
 
@@ -83,6 +85,8 @@ swift test               # run the parser tests
 ```
 
 The app is signed ad hoc, so macOS may ask for notification and microphone permission again after a rebuild.
+
+Interface text is written in English in the code and translated in `Resources/<language>.lproj/Localizable.strings`. After changing any text, run `./scripts/check-translations.py` to find strings that are missing or no longer used.
 
 ## Contributing
 

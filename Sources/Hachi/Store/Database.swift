@@ -32,7 +32,7 @@ final class Database {
     init(url: URL) throws {
         try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
         guard sqlite3_open(url.path, &handle) == SQLITE_OK else {
-            throw DatabaseError(description: "Tidak bisa membuka database di \(url.path)")
+            throw DatabaseError(description: "Can't open the database at \(url.path)")
         }
         try execute("PRAGMA journal_mode = WAL")
     }

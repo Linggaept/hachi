@@ -3,7 +3,12 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleDevelopmentRegion</key>
-    <string>id</string>
+    <string>en</string>
+    <key>CFBundleLocalizations</key>
+    <array>
+        <string>en</string>
+        <string>id</string>
+    </array>
     <key>CFBundleDisplayName</key>
     <string>Hachi</string>
     <key>CFBundleName</key>
@@ -17,17 +22,17 @@
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.0.0</string>
+    <string>1.1.0</string>
     <key>CFBundleVersion</key>
-    <string>1</string>
+    <string>2</string>
     <key>LSMinimumSystemVersion</key>
     <string>26.0</string>
     <key>LSUIElement</key>
     <true/>
     <key>NSMicrophoneUsageDescription</key>
-    <string>Dipakai saat kamu mencatat tugas dengan suara.</string>
+    <string>Used when you add a task by voice.</string>
     <key>NSSpeechRecognitionUsageDescription</key>
-    <string>Mengubah ucapanmu menjadi teks tugas.</string>
+    <string>Turns what you say into task text.</string>
     <key>NSHumanReadableCopyright</key>
     <string>Hachi</string>
 </dict>

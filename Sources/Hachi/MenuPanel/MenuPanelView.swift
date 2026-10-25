@@ -66,7 +66,7 @@ struct MenuPanelView: View {
             Button(action: actions.capture) {
                 HStack {
                     Image(systemName: "plus.circle.fill").foregroundStyle(Color.accentColor)
-                    Text("Catat tugas…")
+                    Text("Add a task…")
                     Spacer()
                     Text(settings.hotkey.label).foregroundStyle(.secondary).font(.callout)
                 }
@@ -86,15 +86,15 @@ struct MenuPanelView: View {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 0) {
                     if state.showDone {
-                        section("Selesai · \(TaskStore.doneWindowDays) hari terakhir", store.done, tint: .secondary)
-                        if store.done.isEmpty { empty("Belum ada tugas yang selesai.") }
+                        section(String(localized: "Done · last \(TaskStore.doneWindowDays) days"), store.done, tint: .secondary)
+                        if store.done.isEmpty { empty(String(localized: "No completed tasks yet.")) }
                     } else {
-                        section("Terlambat", store.overdue, tint: .red)
-                        section("Hari ini", store.today, tint: .primary)
-                        section("Akan datang", store.upcoming, tint: .primary)
-                        section("Tanpa tanggal", store.someday, tint: .primary)
+                        section(String(localized: "Overdue"), store.overdue, tint: .red)
+                        section(String(localized: "Today"), store.today, tint: .primary)
+                        section(String(localized: "Upcoming"), store.upcoming, tint: .primary)
+                        section(String(localized: "No date"), store.someday, tint: .primary)
                         if store.open.isEmpty {
-                            empty("Belum ada tugas. Tekan \(settings.hotkey.label) untuk mencatat.")
+                            empty(String(localized: "No tasks yet. Press \(settings.hotkey.label) to add one."))
                         }
                     }
                 }
@@ -109,20 +109,20 @@ struct MenuPanelView: View {
                     state.showDone.toggle()
                 } label: {
                     if state.showDone {
-                        Label("Daftar tugas", systemImage: "chevron.left")
+                        Label("Task list", systemImage: "chevron.left")
                     } else {
                         HStack(spacing: 4) {
-                            Label("Selesai hari ini (\(store.doneTodayCount))", systemImage: "checkmark.circle")
+                            Label("Done today (\(store.doneTodayCount))", systemImage: "checkmark.circle")
                             Image(systemName: "chevron.right").font(.caption2)
                         }
                     }
                 }
-                .help(state.showDone ? "Kembali ke daftar tugas" : "Lihat dan batalkan tugas yang sudah selesai")
+                .help(state.showDone ? String(localized: "Back to the task list") : String(localized: "See and undo completed tasks"))
                 Spacer()
                 Button(action: actions.settings) { Image(systemName: "gearshape") }
-                    .help("Pengaturan")
+                    .help("Settings")
                 Button(action: actions.quit) { Image(systemName: "power") }
-                    .help("Keluar dari Hachi")
+                    .help("Quit Hachi")
             }
             .buttonStyle(.plain)
             .foregroundStyle(.secondary)
@@ -134,12 +134,12 @@ struct MenuPanelView: View {
 
     private var welcomeCard: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Selamat datang di Hachi").font(.headline)
-            Text("Tekan \(settings.hotkey.label) dari aplikasi mana pun untuk mencatat. Tahan shortcut-nya untuk bicara. Aplikasi menyala otomatis saat login; bisa dimatikan di Pengaturan.")
+            Text("Welcome to Hachi").font(.headline)
+            Text("Press \(settings.hotkey.label) from any app to add a task. Hold the shortcut to speak. Hachi starts automatically at login; you can turn this off in Settings.")
                 .font(.callout)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
-            Button("Mengerti") {
+            Button("Got it") {
                 settings.onboarded = true
                 state.welcome = false
             }
@@ -151,7 +151,7 @@ struct MenuPanelView: View {
     @ViewBuilder
     private func section(_ title: String, _ items: [TaskItem], tint: Color) -> some View {
         if !items.isEmpty {
-            Text("\(title.uppercased()) (\(items.count))")
+            Text(verbatim: "\(title.uppercased(with: Formatting.locale)) (\(items.count))")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(tint == .red ? Color.red : Color.secondary)
                 .padding(.horizontal, 14)
@@ -191,7 +191,7 @@ private struct TaskRow: View {
                     .foregroundStyle(checked ? Color.green : Color.secondary)
             }
             .buttonStyle(.plain)
-            .help(checked ? "Batal selesai" : "Tandai selesai")
+            .help(checked ? String(localized: "Mark as not done") : String(localized: "Mark as done"))
 
             // Area ubah dipisah dari tombol ✓ supaya klik di ✓ tidak tertelan gerakan baris.
             Button(action: onEdit) {
@@ -220,16 +220,16 @@ private struct TaskRow: View {
         .padding(.vertical, 6)
         .contextMenu {
             if task.isDone {
-                Button("Batal selesai") { store.uncomplete(task.id) }
+                Button("Mark as not done") { store.uncomplete(task.id) }
             } else if state.pending.contains(task.id) {
-                Button("Batal selesai") { state.cancel(task.id) }
+                Button("Mark as not done") { state.cancel(task.id) }
             } else {
-                Button("Ubah…", action: onEdit)
-                Button("Pindah ke besok") { store.moveToTomorrow(task.id) }
-                Button("Tandai selesai") { state.toggleComplete(task.id) }
+                Button("Edit…", action: onEdit)
+                Button("Move to tomorrow") { store.moveToTomorrow(task.id) }
+                Button("Mark as done") { state.toggleComplete(task.id) }
             }
             Divider()
-            Button("Hapus", role: .destructive) {
+            Button("Delete", role: .destructive) {
                 state.cancel(task.id)
                 store.delete(task.id)
             }

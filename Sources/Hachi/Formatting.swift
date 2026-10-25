@@ -1,24 +1,56 @@
 import Foundation
+import TodoParser
 
-/// Label tanggal dan jam berbahasa Indonesia.
+/// Label tanggal, jam, dan durasi dalam bahasa tampilan app, dengan format wilayah dari pengaturan Mac.
 enum Formatting {
-    static let locale = Locale(identifier: "id_ID")
+    /// Bahasa mengikuti terjemahan yang dipilih macOS untuk app ini; wilayah dan format jam dari pengaturan Mac.
+    static let locale: Locale = {
+        var components = Locale.Components(locale: .autoupdatingCurrent)
+        if let language = Bundle.main.preferredLocalizations.first {
+            components.languageComponents.languageCode = Locale.LanguageCode(language)
+        }
+        return Locale(components: components)
+    }()
 
-    private static func formatter(_ format: String) -> DateFormatter {
+    private static var calendar: Calendar {
+        var calendar = Calendar.current
+        calendar.locale = locale
+        return calendar
+    }
+
+    private static func formatter(_ template: String) -> DateFormatter {
         let f = DateFormatter()
         f.locale = locale
-        f.dateFormat = format
+        f.setLocalizedDateFormatFromTemplate(template)
         return f
     }
 
-    private static let time = formatter("HH.mm")
+    private static let time = formatter("jmm")
     private static let shortDay = formatter("EEE")
-    private static let dayMonth = formatter("d MMM")
-    private static let dayMonthYear = formatter("d MMM yyyy")
-    private static let longDay = formatter("EEEE, d MMM")
-    private static let longDayYear = formatter("EEEE, d MMM yyyy")
+    private static let dayMonth = formatter("dMMM")
+    private static let dayMonthYear = formatter("dMMMyyyy")
+    private static let longDay = formatter("EEEEdMMM")
+    private static let longDayYear = formatter("EEEEdMMMyyyy")
+
+    private static let durationFormatter: DateComponentsFormatter = {
+        let f = DateComponentsFormatter()
+        f.unitsStyle = .full
+        f.calendar = calendar
+        return f
+    }()
+
+    private static let relative: RelativeDateTimeFormatter = {
+        let f = RelativeDateTimeFormatter()
+        f.locale = locale
+        return f
+    }()
 
     static func clock(_ date: Date) -> String { time.string(from: date) }
+
+    /// Jam bulat untuk pilihan di Pengaturan dan form, mis. "08.00" atau "8:00 AM".
+    static func hour(_ hour: Int) -> String {
+        clock(Calendar.current.date(bySettingHour: hour, minute: 0, second: 0, of: Date())!)
+    }
 
     private static func dayDiff(_ date: Date, from now: Date, calendar: Calendar) -> Int {
         calendar.dateComponents([.day], from: calendar.startOfDay(for: now), to: calendar.startOfDay(for: date)).day ?? 0
@@ -32,9 +64,9 @@ enum Formatting {
         let day: String
         switch diff {
         case 0: day = ""
-        case -1: day = "Kemarin"
-        case 1: day = "Besok"
-        case ..<(-1): day = "\(-diff) hari lalu"
+        case -1: day = String(localized: "Yesterday")
+        case 1: day = String(localized: "Tomorrow")
+        case ..<(-1): day = relative.localizedString(from: DateComponents(day: diff))
         case 2...6: day = shortDay.string(from: due)
         default:
             day = calendar.isDate(due, equalTo: now, toGranularity: .year)
@@ -49,49 +81,64 @@ enum Formatting {
         let diff = dayDiff(due, from: now, calendar: calendar)
         let day: String
         switch diff {
-        case 0: day = "Hari ini"
-        case 1: day = "Besok"
-        case -1: day = "Kemarin"
+        case 0: day = String(localized: "Today")
+        case 1: day = String(localized: "Tomorrow")
+        case -1: day = String(localized: "Yesterday")
         default:
             day = calendar.isDate(due, equalTo: now, toGranularity: .year)
                 ? longDay.string(from: due) : longDayYear.string(from: due)
         }
-        return day + " · " + (allDay ? "Seharian" : time.string(from: due))
+        return day + " · " + (allDay ? String(localized: "All day") : time.string(from: due))
     }
 
     static func offsetLabel(_ offset: Double?) -> String {
-        guard let offset else { return "Tanpa pengingat" }
-        if offset == 0 { return "Tepat waktu" }
-        let minutes = Int(offset / 60)
-        if minutes % 1440 == 0 { return "\(minutes / 1440) hari sebelumnya" }
-        if minutes % 60 == 0 { return "\(minutes / 60) jam sebelumnya" }
-        return "\(minutes) menit sebelumnya"
+        guard let offset else { return String(localized: "No reminder") }
+        if offset == 0 { return String(localized: "On time") }
+        return String(localized: "\(duration(offset)) before")
     }
 
+    /// "30 menit", "1 jam, 5 menit", "2 hari".
     static func duration(_ seconds: Double) -> String {
         let minutes = Int((abs(seconds) / 60).rounded())
-        if minutes < 60 { return "\(minutes) menit" }
-        if minutes < 1440 {
-            let h = minutes / 60, m = minutes % 60
-            return m == 0 ? "\(h) jam" : "\(h) jam \(m) menit"
+        let f = durationFormatter
+        f.allowedUnits = minutes < 1440 ? [.hour, .minute] : [.day]
+        let value = minutes < 1440 ? Double(minutes * 60) : Double(minutes / 1440 * 86400)
+        return f.string(from: value) ?? ""
+    }
+
+    static func repeatLabel(_ rule: RepeatRule) -> String {
+        switch rule {
+        case .daily(1): return String(localized: "Every day")
+        case .daily(let every): return String(localized: "Every \(every) days")
+        case .weekly(_, let days) where days.sorted() == RepeatRule.workdays: return String(localized: "Every weekday")
+        case .weekly(1, let days) where days.isEmpty: return String(localized: "Every week")
+        case .weekly(let every, let days) where days.isEmpty: return String(localized: "Every \(every) weeks")
+        case .weekly(_, let days):
+            let names = RepeatRule.mondayFirst(days).map { calendar.standaloneWeekdaySymbols[$0 - 1] }
+            return String(localized: "Every \(names.joined(separator: " & "))")
+        case .monthly(let day): return String(localized: "Monthly on day \(day)")
+        case .yearly: return String(localized: "Every year")
         }
-        return "\(minutes / 1440) hari"
     }
 
     /// Isi notifikasi pengingat.
     static func reminderBody(for task: TaskItem, at moment: Date, calendar: Calendar = .current) -> String {
-        guard let due = task.due else { return "Pengingat" }
+        guard let due = task.due else { return String(localized: "Reminder") }
         if task.allDay {
             let diff = dayDiff(due, from: moment, calendar: calendar)
             switch diff {
-            case 0: return "Hari ini"
-            case 1: return "Besok"
+            case 0: return String(localized: "Today")
+            case 1: return String(localized: "Tomorrow")
             default: return longDue(due, allDay: true, now: moment, calendar: calendar)
             }
         }
         let gap = due.timeIntervalSince(moment)
-        let prefix = calendar.isDate(due, inSameDayAs: moment) ? "Jam \(time.string(from: due))" : longDue(due, allDay: false, now: moment, calendar: calendar)
-        if abs(gap) < 60 { return prefix + " · sekarang" }
-        return gap > 0 ? prefix + " · \(duration(gap)) lagi" : prefix + " · lewat \(duration(gap))"
+        let prefix = calendar.isDate(due, inSameDayAs: moment)
+            ? String(localized: "At \(time.string(from: due))")
+            : longDue(due, allDay: false, now: moment, calendar: calendar)
+        if abs(gap) < 60 { return String(localized: "\(prefix) · now") }
+        return gap > 0
+            ? String(localized: "\(prefix) · in \(duration(gap))")
+            : String(localized: "\(prefix) · \(duration(gap)) ago")
     }
 }
