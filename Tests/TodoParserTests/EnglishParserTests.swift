@@ -268,3 +268,16 @@ private func en(_ text: String, now: Date = friday10, monthFirst: Bool = false) 
     #expect(t.due == at(2026, 10, 23))
     #expect(t.allDay)
 }
+
+// MARK: - Temuan review
+
+@Test func kurangSeperempatJamSatu() {
+    #expect(en("quarter to 1 lunch").due == at(2026, 10, 23, 12, 45))
+}
+
+@Test func kataSambungAsliTetapDiJudul() {
+    #expect(en("turn the lights on").title == "Turn the lights on")
+    #expect(en("put the kettle on at 3pm").title == "Put the kettle on")
+    #expect(en("remind me to call mom at 5pm").title == "Call mom")
+    #expect(en("deadline proposal by friday").title == "Deadline proposal")
+}

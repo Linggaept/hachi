@@ -111,7 +111,8 @@ struct EnglishParser: LanguageParser {
         } else if let m = cursor.take(EnglishPatterns.pastTo) {
             let hour = Self.number(m[3]) ?? 0
             let minutes = m[1] == "half" ? 30 : 15
-            let (h, minute) = m[2] == "to" ? (hour - 1, 60 - minutes) : (hour, minutes)
+            var (h, minute) = m[2] == "to" ? (hour - 1, 60 - minutes) : (hour, minutes)
+            if h <= 0 { h += 12 }
             p.clock = ParserCore.Clock(hourText: String(h), hour: h, minute: minute)
         } else if let m = cursor.take(EnglishPatterns.atClock) ?? cursor.take(EnglishPatterns.bareClock) {
             p.clock = ParserCore.Clock(hourText: m[1] ?? "", hour: Self.number(m[1]) ?? 0, minute: Int(m[2] ?? "") ?? 0)
@@ -132,13 +133,20 @@ struct EnglishParser: LanguageParser {
             p.dayPart = p.dayPart ?? Self.dayPart(m[1])
         }
 
-        let title = ParserCore.cleanTitle(cursor.remaining, fallback: text, edge: Self.edge)
+        let title = ParserCore.cleanTitle(Self.dropConnectors(cursor.remaining), fallback: text, edge: Self.edge)
         return (core.assemble(p, title: title, now: now), cursor.consumed)
     }
 
     // MARK: - Kata
 
-    static let edge = #"(?i)^(?:and|at|on|by|to|the|,|-|:)\s+|\s+(?:and|at|on|by|to|the|,|-|:)$|^[,\-:]+|[,\-:]+$"#
+    static let edge = #"^[,\-:]+|[,\-:]+$"#
+
+    /// Kata sambung dibuang hanya bila menempel ke bagian waktu yang sudah dibaca (bekasnya dua spasi atau lebih):
+    /// "remind me to call mom" jadi "call mom", "deadline by friday" jadi "deadline", tetapi "turn the lights on" utuh.
+    /// "at", "on", dan "the" sudah ikut termakan pola waktunya sendiri, jadi tidak disentuh di sini.
+    static func dropConnectors(_ remaining: String) -> String {
+        remaining.replacingOccurrences(of: #"(?i)(?<=\s\s)(?:to|and)\b|\b(?:by|and)(?=\s\s)"#, with: "", options: .regularExpression)
+    }
 
     static let numberWords: [String: Int] = [
         "a": 1, "an": 1, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8,
