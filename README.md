@@ -1,10 +1,29 @@
-# Hachi
+<p align="center">
+  <img src="docs/icon.png" width="128" alt="Hachi app icon: a smiling Shiba dog with a checkmark tag">
+</p>
 
-**English** · [Bahasa Indonesia](README.id.md)
+<h1 align="center">Hachi</h1>
 
-A to-do app that lives in your macOS menu bar. Press <kbd>⌥ Space</kbd> from any app, type or say what you need to do in everyday language, and Hachi turns it into a task with the right date, time, and reminder.
+<p align="center">
+  <strong>Capture a to-do in seconds, right from your Mac's menu bar.</strong><br>
+  Press <kbd>⌥ Space</kbd>, type it the way you'd say it, and get reminded on time.
+</p>
 
-No AI, no account, no server. Everything stays on your Mac.
+<p align="center">
+  <a href="https://github.com/Linggaept/hachi/releases/latest"><img src="https://img.shields.io/github/v/release/Linggaept/hachi?label=download" alt="Latest release"></a>
+  <img src="https://img.shields.io/badge/macOS-26%2B-black?logo=apple" alt="macOS 26 or later">
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/Linggaept/hachi" alt="MIT license"></a>
+</p>
+
+<p align="center"><strong>English</strong> · <a href="README.id.md">Bahasa Indonesia</a></p>
+
+Type or say what you need to do in everyday language, from any app, and Hachi turns it into a task with the right date, time, and reminder. No AI, no account, no server. Everything stays on your Mac.
+
+<p align="center">
+  <img src="docs/demo.gif" width="694" alt="Pressing Option-Space, typing a task in plain language, and seeing the date and reminder filled in before it lands in the list">
+  <br>
+  <sub>Typed in Indonesian here. English sentences work the same way.</sub>
+</p>
 
 Named after Hachiko, the dog who waited at the station at the same time every day.
 
@@ -17,6 +36,7 @@ Hachi understands sentences in **English and Indonesian**. You don't pick a lang
 - **Reminders that arrive on time,** even when the panel is closed or the Mac just woke up. Act on them right from the notification: Done, Snooze 10 min, Snooze 1 hour, Tomorrow.
 - **Repeating tasks** like "every Monday" or "every 1st of the month" reschedule themselves when you complete them.
 - **Morning summary** once a day, and a gentle check on undated tasks you haven't touched for 14 days.
+- **Light enough to leave running all day.** While idle, Hachi uses about 40 MB of memory and practically no CPU, because reminders are handed to macOS to deliver instead of Hachi watching the clock. It stays out of the way of heavy apps like browsers, design tools, or IDEs. The whole app is 3 MB. *(Measured on an M4 Mac with macOS 27.)*
 - **Native and dependency-free.** Swift and SwiftUI, with macOS's built-in SQLite and speech recognition.
 
 ## Install
@@ -45,6 +65,13 @@ The interface follows your Mac's language (English or Indonesian). To use a diff
 | See your list | Click the Shiba icon in the menu bar. The number next to it is how many tasks are overdue. |
 
 The shortcut can be changed in Settings.
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/panel-dark.png">
+    <img src="docs/panel-light.png" width="360" alt="The Hachi menu bar panel with tasks grouped into Overdue, Today, Upcoming, and No date">
+  </picture>
+</p>
 
 ### Example sentences
 

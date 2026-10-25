@@ -1,10 +1,31 @@
-# Hachi
+<p align="center">
+  <img src="docs/icon.png" width="128" alt="Ikon Hachi: anjing Shiba tersenyum dengan liontin centang">
+</p>
 
-[English](README.md) · **Bahasa Indonesia**
+<h1 align="center">Hachi</h1>
 
-Asisten todo di menu bar macOS. Catat tugas pakai bahasa sehari-hari, boleh diketik atau diucapkan, lalu pengingatnya datang tepat waktu. Tanpa AI, tanpa akun, semua data tersimpan di Mac ini.
+<p align="center">
+  <strong>Catat tugas dalam hitungan detik, langsung dari menu bar Mac.</strong><br>
+  Tekan <kbd>⌥ Space</kbd>, ketik seperti kamu bicara, lalu diingatkan tepat waktu.
+</p>
+
+<p align="center">
+  <a href="https://github.com/Linggaept/hachi/releases/latest"><img src="https://img.shields.io/github/v/release/Linggaept/hachi?label=download" alt="Latest release"></a>
+  <img src="https://img.shields.io/badge/macOS-26%2B-black?logo=apple" alt="macOS 26 or later">
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/Linggaept/hachi" alt="MIT license"></a>
+</p>
+
+<p align="center"><a href="README.md">English</a> · <strong>Bahasa Indonesia</strong></p>
+
+Catat tugas pakai bahasa sehari-hari dari aplikasi mana pun, boleh diketik atau diucapkan, dan Hachi mengubahnya jadi tugas lengkap dengan tanggal, jam, dan pengingat. Tanpa AI, tanpa akun, semua data tersimpan di Mac ini.
+
+<p align="center">
+  <img src="docs/demo.gif" width="694" alt="Menekan Option-Space, mengetik tugas dengan bahasa sehari-hari, lalu tanggal dan pengingatnya terisi sebelum masuk daftar">
+</p>
 
 Namanya diambil dari Hachiko, anjing yang setiap hari menunggu tepat pada jamnya.
+
+Hachi ringan, jadi aman dibiarkan menyala seharian. Saat diam, Hachi hanya memakai sekitar 40 MB memori dan hampir tidak memakai CPU, karena pengingat diserahkan ke macOS untuk dikirim, bukan ditunggu oleh Hachi. Jadi tidak mengganggu app berat seperti browser, aplikasi desain, atau IDE. Ukuran app-nya 3 MB. *(Diukur di Mac M4 dengan macOS 27.)*
 
 Hachi mengerti kalimat **bahasa Indonesia dan Inggris** tanpa perlu memilih bahasa dulu: tiap kalimat dibaca dengan keduanya, lalu dipakai yang paling banyak mengenali bagian waktunya.
 
@@ -67,6 +88,13 @@ Input suara mendengarkan dalam bahasa tampilan Hachi. Kalau ingin bicara dalam b
 ## Panel menu bar
 
 Klik ikon Shiba untuk melihat panel. Angka di sebelah ikon = jumlah tugas terlambat.
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/panel-id-dark.png">
+    <img src="docs/panel-id-light.png" width="360" alt="Panel Hachi di menu bar dengan tugas dikelompokkan jadi Terlambat, Hari ini, Akan datang, dan Tanpa tanggal">
+  </picture>
+</p>
 
 - Tugas dikelompokkan jadi **Terlambat · Hari ini · Akan datang · Tanpa tanggal**.
 - Klik ○ untuk menandai selesai. Tugasnya tetap di tempat 3 detik (tercoret); salah klik? Klik lagi untuk membatalkan. Klik judul untuk mengubah tugas.
