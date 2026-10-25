@@ -1,0 +1,16 @@
+# Hasil build Swift Package Manager dan skrip build-app.sh
+.build/
+build/
+.swiftpm/
+Package.resolved
+
+# Editor dan macOS
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# Data lokal (database tugas ada di ~/Library, bukan di repo)
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
