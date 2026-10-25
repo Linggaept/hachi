@@ -27,3 +27,31 @@ private func parse(_ text: String, prefer language: ParserLanguage = .indonesian
     #expect(t.title == "Beli kopi")
     #expect(t.due == nil)
 }
+
+@Test func inggrisDikenaliOtomatis() {
+    let t = parse("tomorrow 3pm call client", prefer: .indonesian)
+    #expect(t.title == "Call client")
+    #expect(t.due == at(2026, 10, 24, 15))
+}
+
+@Test func indonesiaDikenaliOtomatis() {
+    let t = parse("besok jam 3 sore call client", prefer: .english)
+    #expect(t.title == "Call client")
+    #expect(t.due == at(2026, 10, 24, 15))
+}
+
+@Test func pemenangKarakterTerbanyak() {
+    let t = parse("meeting at 15.30", prefer: .indonesian)
+    #expect(t.title == "Meeting")
+    #expect(t.due == at(2026, 10, 23, 15, 30))
+}
+
+@Test func kataInggrisDiKalimatIndonesia() {
+    let meeting = parse("meeting tiap senin jam 9", prefer: .english)
+    #expect(meeting.title == "Meeting")
+    #expect(meeting.repeatRule == .weekly(every: 1, weekdays: [2]))
+    #expect(meeting.due == at(2026, 10, 26, 9))
+    let deadline = parse("deadline proposal jumat depan", prefer: .english)
+    #expect(deadline.title == "Deadline proposal")
+    #expect(deadline.due == at(2026, 10, 30))
+}
