@@ -154,3 +154,117 @@ private func en(_ text: String, now: Date = friday10, monthFirst: Bool = false) 
     #expect(t.due == nil)
     #expect(en("march on").due == nil)
 }
+
+// MARK: - Pengingat, pengulangan, judul
+
+@Test func contohUtamaInggris() {
+    let t = en("tomorrow at 3pm call client remind me 30 minutes before")
+    #expect(t.title == "Call client")
+    #expect(t.due == at(2026, 10, 24, 15))
+    #expect(t.remindOffset == 1800)
+}
+
+@Test func pengingatSeharian() {
+    let t = en("friday pay rent remind me")
+    #expect(t.title == "Pay rent")
+    #expect(t.allDay)
+    #expect(t.remindOffset == 0)
+}
+
+@Test func remindMeTo() {
+    let t = en("remind me to call mom at 5pm")
+    #expect(t.title == "Call mom")
+    #expect(t.due == at(2026, 10, 23, 17))
+    #expect(t.remindOffset == 0)
+}
+
+@Test func jamSebelum() {
+    let t = en("standup at 9 an hour before")
+    #expect(t.title == "Standup")
+    #expect(t.remindOffset == 3600)
+}
+
+@Test func tiapHariInggris() {
+    for text in ["every day 7am stretch", "daily 7am stretch"] {
+        let t = en(text)
+        #expect(t.title == "Stretch")
+        #expect(t.repeatRule == .daily(every: 1))
+        #expect(t.due == at(2026, 10, 24, 7))
+    }
+}
+
+@Test func tiapHariKerjaInggris() {
+    let t = en("every weekday at 8 check in")
+    #expect(t.title == "Check in")
+    #expect(t.repeatRule == .weekly(every: 1, weekdays: RepeatRule.workdays))
+    #expect(t.due == at(2026, 10, 26, 8))
+}
+
+@Test func tiapHariTertentu() {
+    let t = en("every monday and thursday 9am gym")
+    #expect(t.title == "Gym")
+    #expect(t.repeatRule == .weekly(every: 1, weekdays: [2, 5]))
+    #expect(t.due == at(2026, 10, 26, 9))
+}
+
+@Test func tiapNMinggu() {
+    let t = en("every 2 weeks team sync")
+    #expect(t.title == "Team sync")
+    #expect(t.repeatRule == .weekly(every: 2, weekdays: []))
+}
+
+@Test func tiapNHari() {
+    let t = en("every 3 days water plants")
+    #expect(t.title == "Water plants")
+    #expect(t.repeatRule == .daily(every: 3))
+}
+
+@Test func tiapBulanTanggal() {
+    for text in ["every month on the 1st pay rent", "on the 1st of every month pay rent", "every 1st pay rent"] {
+        let t = en(text)
+        #expect(t.title == "Pay rent")
+        #expect(t.repeatRule == .monthly(day: 1))
+        #expect(t.due == at(2026, 11, 1))
+    }
+}
+
+@Test func tiapBulanInggris() {
+    let t = en("monthly invoice")
+    #expect(t.title == "Invoice")
+    #expect(t.repeatRule == .monthly(day: 23))
+}
+
+@Test func tiapTahunInggris() {
+    let t = en("every year renew passport")
+    #expect(t.title == "Renew passport")
+    #expect(t.repeatRule == .yearly)
+}
+
+@Test func tiapPagiInggris() {
+    let t = en("every morning journal")
+    #expect(t.title == "Journal")
+    #expect(t.repeatRule == .daily(every: 1))
+    #expect(t.due == at(2026, 10, 24, 8))
+}
+
+@Test func kataBiasaTetapJudul() {
+    for (text, title) in [("buy sun cream", "Buy sun cream"), ("sat down with Sam", "Sat down with Sam"),
+                          ("morning run", "Morning run"), ("dinner with Sam", "Dinner with Sam")] {
+        let t = en(text)
+        #expect(t.title == title)
+        #expect(t.due == nil)
+    }
+}
+
+@Test func hurufBesarDanTandaBaca() {
+    let t = en("Tomorrow, 3PM: call client")
+    #expect(t.title == "Call client")
+    #expect(t.due == at(2026, 10, 24, 15))
+}
+
+@Test func kataSambungDiUjung() {
+    let t = en("pay rent on friday")
+    #expect(t.title == "Pay rent")
+    #expect(t.due == at(2026, 10, 23))
+    #expect(t.allDay)
+}

@@ -10,6 +10,39 @@ struct EnglishParser: LanguageParser {
         let today = calendar.startOfDay(for: now)
         var p = ParserCore.Pieces()
 
+        // Pengingat.
+        if let m = cursor.take(EnglishPatterns.remindAmount) ?? cursor.take(EnglishPatterns.amountBefore) {
+            p.remindOffset = Self.amountSeconds(m[1], number: m[2], unit: m[3])
+            p.explicitRemind = true
+        }
+        if cursor.take(EnglishPatterns.remindWord) != nil {
+            p.explicitRemind = true
+        }
+
+        // Berulang.
+        if cursor.take(EnglishPatterns.everyWeekday) != nil {
+            p.rule = .weekly(every: 1, weekdays: RepeatRule.workdays)
+        } else if let m = cursor.take(EnglishPatterns.everyDays) {
+            p.rule = .weekly(every: 1, weekdays: Self.weekdays(in: m[1]))
+        } else if let m = cursor.take(EnglishPatterns.everyN) {
+            let n = max(1, Self.number(m[1]) ?? 1)
+            p.rule = Self.unit(m[2]) == .day ? .daily(every: n) : .weekly(every: n, weekdays: [])
+        } else if let m = cursor.take(EnglishPatterns.everyMonthOnDay) {
+            p.rule = .monthly(day: min(31, max(1, Int(m[1] ?? m[2] ?? m[3] ?? "") ?? 1)))
+        } else if cursor.take(EnglishPatterns.everyDay) != nil {
+            p.rule = .daily(every: 1)
+        } else if cursor.take(EnglishPatterns.everyWeek) != nil {
+            p.rule = .weekly(every: 1, weekdays: [])
+        } else if let m = cursor.take(EnglishPatterns.everyDayPart) {
+            p.rule = .daily(every: 1)
+            p.dayPart = Self.dayPart(m[1])
+        } else if cursor.take(EnglishPatterns.everyMonth) != nil {
+            p.rule = .monthly(day: 1)
+            p.monthlyFromDue = true
+        } else if cursor.take(EnglishPatterns.everyYear) != nil {
+            p.rule = .yearly
+        }
+
         // Dari sekarang.
         if let m = cursor.take(EnglishPatterns.fromNow) ?? cursor.take(EnglishPatterns.fromNowSuffix) {
             let amount = m[1] ?? "", unit = Self.unit(m[3])
@@ -136,6 +169,12 @@ struct EnglishParser: LanguageParser {
         return nil
     }
 
+    static func amountSeconds(_ amount: String?, number: String?, unit: String?) -> TimeInterval? {
+        if amount?.lowercased().hasPrefix("half") == true { return 1800 }
+        guard let n = Self.number(number), let unit = Self.unit(unit), unit != .week, unit != .month else { return nil }
+        return seconds(n, unit)
+    }
+
     static func seconds(_ n: Int, _ unit: Unit?) -> TimeInterval {
         switch unit {
         case .minute: TimeInterval(n * 60)
@@ -183,6 +222,27 @@ enum EnglishPatterns {
     static let day = #"(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday|mon|tues?|wed|thu(?:rs?)?|fri)"#
     static let month = #"(?:january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sept?|oct|nov|dec)"#
     static let ordinal = #"(?:st|nd|rd|th)"#
+
+    static let amount = "(half\\s+an\\s+hour|(\(amountNum))\\s*\(unit))"
+    static let before = #"(?:before(?:hand)?|earlier)"#
+    static let remindAmount = regex("\\bremind\\s+me\\s+\(amount)\\s+\(before)\\b")
+    static let amountBefore = regex("\\b\(amount)\\s+\(before)\\b")
+    static let remindWord = regex(#"\bremind\s+me\b"#)
+
+    static let dayList = "\(day)(?:\\s*(?:,|and|&)\\s*\(day))*"
+    static let everyWeekday = regex(#"\bevery\s+weekday\b"#)
+    static let everyDays = regex("\\bevery\\s+(\(dayList))\\b")
+    static let everyN = regex("\\bevery\\s+(\(num))\\s+(days?|weeks?)\\b")
+    static let everyMonthOnDay = regex(
+        "\\bevery\\s+month\\s+on\\s+the\\s+(\\d{1,2})\(ordinal)?\\b"
+            + "|\\b(?:on\\s+)?the\\s+(\\d{1,2})\(ordinal)\\s+of\\s+(?:every|each)\\s+month\\b"
+            + "|\\bevery\\s+(\\d{1,2})\(ordinal)\\b"
+    )
+    static let everyDay = regex(#"\b(?:every\s+day|daily)\b"#)
+    static let everyWeek = regex(#"\b(?:every\s+week|weekly)\b"#)
+    static let everyDayPart = regex(#"\bevery\s+(morning|afternoon|evening|night)\b"#)
+    static let everyMonth = regex(#"\b(?:every\s+month|monthly)\b"#)
+    static let everyYear = regex(#"\b(?:every\s+year|yearly|annually)\b"#)
 
     static let fromNow = regex("\\bin\\s+(half\\s+an\\s+hour|(\(amountNum))\\s*\(unit))\\b")
     static let fromNowSuffix = regex("\\b((\(amountNum))\\s*\(unit))\\s+from\\s+now\\b")
