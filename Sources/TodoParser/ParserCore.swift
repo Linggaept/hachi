@@ -129,6 +129,69 @@ struct ParserCore {
         return anchor
     }
 
+    // MARK: - Gabungkan
+
+    /// Bagian kalimat yang sudah dikenali, sebelum digabung jadi waktu tugas.
+    struct Pieces {
+        var remindOffset: TimeInterval?
+        var explicitRemind = false
+        var rule: RepeatRule?
+        var monthlyFromDue = false
+        var exactDue: Date?
+        var date: Date?
+        var pickedWeekday = false
+        var clock: Clock?
+        /// Jam pasti (am/pm, noon, midnight) yang tidak perlu ditebak pagi atau malam.
+        var fixedTime: Resolved?
+        var dayPart: DayPart?
+    }
+
+    func assemble(_ p: Pieces, title: String, now: Date) -> ParsedTask {
+        let today = calendar.startOfDay(for: now)
+        let resolved = p.fixedTime ?? p.clock.map { resolve($0, dayPart: p.dayPart) }
+        var rule = p.rule
+        var due: Date?
+        var allDay = false
+        if let exactDue = p.exactDue {
+            due = exactDue
+        } else if let baseRule = rule {
+            var finalRule = baseRule
+            let time = resolved?.time ?? p.dayPart.map { (settings.hour(for: $0), 0) }
+            let anchor = p.date ?? today
+            if p.monthlyFromDue { finalRule = .monthly(day: calendar.component(.day, from: anchor)) }
+            due = firstOccurrence(of: finalRule, from: anchor, time: time, now: now)
+            allDay = time == nil
+            rule = finalRule
+        } else if resolved != nil || p.dayPart != nil {
+            let resolved = resolved ?? Resolved(time: (settings.hour(for: p.dayPart!), 0), shift: 0, alternative: nil)
+            let base = p.date ?? today
+            var candidate = at(resolved.time, on: add(resolved.shift, to: base))
+            if candidate <= now {
+                if p.date == nil {
+                    if let alt = resolved.alternative, at(alt, on: base) > now {
+                        candidate = at(alt, on: base)
+                    } else {
+                        candidate = add(1, to: candidate)
+                    }
+                } else if p.pickedWeekday {
+                    candidate = add(7, to: candidate)
+                }
+            }
+            due = candidate
+        } else if let date = p.date {
+            due = date
+            allDay = true
+        }
+
+        var remindOffset = p.remindOffset
+        if due == nil {
+            remindOffset = nil
+        } else if !allDay || p.explicitRemind {
+            remindOffset = remindOffset ?? 0
+        }
+        return ParsedTask(title: title, due: due, allDay: allDay, remindOffset: remindOffset, repeatRule: rule)
+    }
+
     /// Merapikan sisa kalimat jadi judul. `edge` = pola kata sambung yang dibuang dari ujung judul.
     static func cleanTitle(_ remaining: String, fallback: String, edge: String) -> String {
         var title = remaining

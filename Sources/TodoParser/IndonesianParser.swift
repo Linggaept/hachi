@@ -127,56 +127,18 @@ struct IndonesianParser: LanguageParser {
         }
         if nanti, date == nil, rule == nil { date = today }
 
-        // Gabungkan.
-        var due: Date?
-        var allDay = false
-        if let exactDue {
-            due = exactDue
-        } else if let baseRule = rule {
-            var finalRule = baseRule
-            let time = clock.map { core.resolve($0, dayPart: dayPart) }?.time ?? dayPart.map { (core.settings.hour(for: $0), 0) }
-            let anchor = date ?? today
-            if monthlyFromDue { finalRule = .monthly(day: core.calendar.component(.day, from: anchor)) }
-            due = core.firstOccurrence(of: finalRule, from: anchor, time: time, now: now)
-            allDay = time == nil
-            rule = finalRule
-        } else if clock != nil || dayPart != nil {
-            let resolved = clock.map { core.resolve($0, dayPart: dayPart) }
-                ?? ParserCore.Resolved(time: (core.settings.hour(for: dayPart!), 0), shift: 0, alternative: nil)
-            let base = date ?? today
-            var candidate = core.at(resolved.time, on: core.add(resolved.shift, to: base))
-            if candidate <= now {
-                if date == nil {
-                    if let alt = resolved.alternative, core.at(alt, on: base) > now {
-                        candidate = core.at(alt, on: base)
-                    } else {
-                        candidate = core.add(1, to: candidate)
-                    }
-                } else if pickedWeekday {
-                    candidate = core.add(7, to: candidate)
-                }
-            }
-            due = candidate
-        } else if let date {
-            due = date
-            allDay = true
-        }
-
-        if due == nil {
-            remindOffset = nil
-        } else if !allDay {
-            remindOffset = remindOffset ?? 0
-        } else if explicitRemind {
-            remindOffset = remindOffset ?? 0
-        }
-
-        let task = ParsedTask(
-            title: ParserCore.cleanTitle(cursor.remaining, fallback: text, edge: Self.edge),
-            due: due,
-            allDay: allDay,
-            remindOffset: remindOffset,
-            repeatRule: rule
-        )
+        var pieces = ParserCore.Pieces()
+        pieces.remindOffset = remindOffset
+        pieces.explicitRemind = explicitRemind
+        pieces.rule = rule
+        pieces.monthlyFromDue = monthlyFromDue
+        pieces.exactDue = exactDue
+        pieces.date = date
+        pieces.pickedWeekday = pickedWeekday
+        pieces.clock = clock
+        pieces.dayPart = dayPart
+        let title = ParserCore.cleanTitle(cursor.remaining, fallback: text, edge: Self.edge)
+        let task = core.assemble(pieces, title: title, now: now)
         return (task, cursor.consumed)
     }
 
