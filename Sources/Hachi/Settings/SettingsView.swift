@@ -17,6 +17,7 @@ struct SettingsView: View {
     let store: TaskStore
     let briefing: BriefingService
     let scheduler: ReminderScheduler
+    let relaunch: () -> Void
 
     var body: some View {
         Form {
@@ -32,6 +33,21 @@ struct SettingsView: View {
                 Text("Press to add a task, hold to speak.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                // Nama bahasa ditulis dalam bahasanya sendiri supaya tetap terbaca apa pun bahasa yang sedang dipakai.
+                Picker("Language", selection: $settings.language) {
+                    Text("Follow system").tag(AppLanguage.system)
+                    Text(verbatim: "English").tag(AppLanguage.en)
+                    Text(verbatim: "Bahasa Indonesia").tag(AppLanguage.id)
+                }
+                if settings.language != settings.launchLanguage {
+                    HStack {
+                        Text("Restart Hachi to use the new language.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        Button("Restart Now", action: relaunch)
+                    }
+                }
             }
 
             Section("Morning summary") {
@@ -88,7 +104,7 @@ struct SettingsView: View {
             }
         }
         .formStyle(.grouped)
-        .frame(width: 480, height: 640)
+        .frame(width: 480, height: 700)
         .task { state.notificationsDenied = await scheduler.authorizationDenied() }
     }
 

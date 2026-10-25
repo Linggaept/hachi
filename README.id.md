@@ -17,7 +17,7 @@ Butuh macOS 26 atau lebih baru, di Mac Apple silicon.
 
 Hachi harus berada di folder Applications supaya bisa menyala otomatis saat login.
 
-Tampilan Hachi mengikuti bahasa Mac (Inggris atau Indonesia). Kalau bahasa Mac-mu Inggris tapi ingin Hachi berbahasa Indonesia, buka **Pengaturan Sistem → Umum → Bahasa & Wilayah → Aplikasi**, tambahkan Hachi, lalu pilih Bahasa Indonesia.
+Tampilan Hachi mengikuti bahasa Mac (Inggris atau Indonesia). Kalau ingin bahasa lain khusus untuk Hachi, pilih di **Pengaturan → Bahasa** di Hachi, lalu buka ulang Hachi.
 
 ## Pertama kali
 
@@ -79,7 +79,7 @@ Notifikasi muncul pada waktunya, walau panel tertutup atau Mac baru bangun dari 
 
 ## Pengaturan
 
-Ikon ⚙︎ di panel. Isinya: nyala saat login, pilihan shortcut, jam ringkasan pagi, jam bagian hari, status izin, dan **Ekspor/Impor** cadangan JSON.
+Ikon ⚙︎ di panel. Isinya: nyala saat login, pilihan shortcut, bahasa, jam ringkasan pagi, jam bagian hari, status izin, dan **Ekspor/Impor** cadangan JSON.
 
 Data tersimpan di `~/Library/Application Support/Hachi/todo.sqlite`.
 

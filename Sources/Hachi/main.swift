@@ -39,7 +39,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         briefing = BriefingService(store: store, settings: settings, scheduler: scheduler)
         capture = CapturePanelController(store: store, settings: settings)
         settingsWindow = SettingsWindowController { [unowned self] in
-            SettingsView(settings: settings, state: SettingsState(), store: store, briefing: briefing, scheduler: scheduler)
+            SettingsView(settings: settings, state: SettingsState(), store: store, briefing: briefing, scheduler: scheduler, relaunch: relaunch)
         }
         statusBar = StatusBarController(store: store, settings: settings, actions: MenuActions(
             capture: { [weak self] in self?.capture.showNew() },
@@ -67,6 +67,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in self?.statusBar.show() }
         }
+    }
+
+    /// Dipakai setelah ganti bahasa: app dibuka lagi begitu proses ini benar-benar selesai.
+    private func relaunch() {
+        statusBar.commitPending()
+        let opener = Process()
+        opener.executableURL = URL(fileURLWithPath: "/bin/sh")
+        opener.arguments = [
+            "-c", "while kill -0 \(ProcessInfo.processInfo.processIdentifier) 2>/dev/null; do sleep 0.2; done; open \"$0\"",
+            Bundle.main.bundleURL.path,
+        ]
+        try? opener.run()
+        NSApp.terminate(nil)
     }
 
     private func hotkeyPressed() {

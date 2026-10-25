@@ -43,6 +43,7 @@
 "Good morning" = "Selamat pagi";
 "Got it" = "Mengerti";
 "Hachi can't open its database" = "Hachi tidak bisa membuka database";
+"Follow system" = "Ikuti sistem";
 "Hachi Settings" = "Pengaturan Hachi";
 "Has a date" = "Pakai tanggal";
 "Hold %@ to speak" = "Tahan %@ untuk bicara";
@@ -50,6 +51,7 @@
 "Import…" = "Impor…";
 "In the morning summary" = "Masuk ringkasan pagi";
 "Listening… release the shortcut or click ⏹ when done" = "Mendengarkan… lepas shortcut atau klik ⏹ kalau sudah";
+"Language" = "Bahasa";
 "Mark as done" = "Tandai selesai";
 "Mark as not done" = "Batal selesai";
 "Microphone access was denied. Open System Settings → Privacy & Security → Microphone." = "Izin mikrofon ditolak. Buka Pengaturan Sistem → Privasi & Keamanan → Mikrofon.";
@@ -86,6 +88,8 @@
 "Quit Hachi" = "Keluar dari Hachi";
 "Remind %@" = "Ingatkan %@";
 "Reminder" = "Pengingat";
+"Restart Hachi to use the new language." = "Buka ulang Hachi untuk memakai bahasa baru.";
+"Restart Now" = "Buka ulang sekarang";
 "Repeat" = "Ulangi";
 "Save" = "Simpan";
 "Saved to %@." = "Tersimpan di %@.";

@@ -33,7 +33,7 @@ Requires macOS 26 or later on Apple silicon.
 
 Hachi starts automatically at login. You can turn this off in Settings. Hachi has to be in the Applications folder for this to work.
 
-The interface follows your Mac's language (English or Indonesian). To use a different language for Hachi only, go to **System Settings → General → Language & Region → Applications**.
+The interface follows your Mac's language (English or Indonesian). To use a different language for Hachi only, pick it under **Settings → Language** in Hachi, then restart Hachi.
 
 ## Using Hachi
 

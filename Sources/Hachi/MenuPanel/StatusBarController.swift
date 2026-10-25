@@ -8,10 +8,13 @@ final class StatusBarController: NSObject {
     private let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     private let popover = NSPopover()
     private let store: TaskStore
+    private let state: MenuPanelState
     private var bag: Set<AnyCancellable> = []
 
     init(store: TaskStore, settings: AppSettings, actions: MenuActions) {
         self.store = store
+        let state = MenuPanelState(store: store, settings: settings)
+        self.state = state
         super.init()
 
         var wrapped = actions
@@ -28,7 +31,6 @@ final class StatusBarController: NSObject {
             actions.settings()
         }
 
-        let state = MenuPanelState(store: store, settings: settings)
         wrapped.quit = {
             state.commitAll()
             actions.quit()
@@ -75,5 +77,10 @@ final class StatusBarController: NSObject {
 
     func close() {
         popover.performClose(nil)
+    }
+
+    /// Centang yang masih dalam jeda batal disimpan sebelum app keluar.
+    func commitPending() {
+        state.commitAll()
     }
 }
