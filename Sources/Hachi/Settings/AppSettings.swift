@@ -39,6 +39,8 @@ final class AppSettings: ObservableObject {
     @Published var briefingHour: Int { didSet { defaults.set(briefingHour, forKey: "briefingHour") } }
     @Published var nudgeEnabled: Bool { didSet { defaults.set(nudgeEnabled, forKey: "nudgeEnabled") } }
     @Published var language: AppLanguage { didSet { saveLanguage() } }
+    /// `.system` = ikut bahasa tampilan.
+    @Published var voiceLanguage: AppLanguage { didSet { defaults.set(voiceLanguage.rawValue, forKey: "voiceLanguage") } }
     /// Bahasa saat app dibuka; bila berbeda dari `language`, app perlu dibuka ulang.
     let launchLanguage: AppLanguage
 
@@ -57,7 +59,7 @@ final class AppSettings: ObservableObject {
         defaults.register(defaults: [
             "hotkey": HotkeyChoice.optionSpace.rawValue,
             "morningHour": 8, "noonHour": 12, "afternoonHour": 16, "eveningHour": 20,
-            "briefingEnabled": true, "briefingHour": 5, "nudgeEnabled": true,
+            "briefingEnabled": true, "briefingHour": 5, "nudgeEnabled": true, "voiceLanguage": AppLanguage.system.rawValue,
         ])
         hotkey = HotkeyChoice(rawValue: defaults.string(forKey: "hotkey") ?? "") ?? .optionSpace
         morningHour = defaults.integer(forKey: "morningHour")
@@ -67,9 +69,19 @@ final class AppSettings: ObservableObject {
         briefingEnabled = defaults.bool(forKey: "briefingEnabled")
         briefingHour = defaults.integer(forKey: "briefingHour")
         nudgeEnabled = defaults.bool(forKey: "nudgeEnabled")
+        voiceLanguage = AppLanguage(rawValue: defaults.string(forKey: "voiceLanguage") ?? "") ?? .system
         let stored = Self.storedLanguage()
         language = stored
         launchLanguage = stored
+    }
+
+    /// Bahasa tampilan yang sedang dipakai ("id" atau "en").
+    static var appLanguageCode: String {
+        Bundle.main.preferredLocalizations.first == "id" ? "id" : "en"
+    }
+
+    var voiceLanguageCode: String {
+        voiceLanguage == .system ? Self.appLanguageCode : voiceLanguage.rawValue
     }
 
     /// Hanya domain app yang dibaca; `object(forKey:)` akan ikut membaca bahasa sistem.
@@ -88,7 +100,11 @@ final class AppSettings: ObservableObject {
     }
 
     var parserSettings: ParserSettings {
-        ParserSettings(morningHour: morningHour, noonHour: noonHour, afternoonHour: afternoonHour, eveningHour: eveningHour)
+        ParserSettings(
+            morningHour: morningHour, noonHour: noonHour, afternoonHour: afternoonHour, eveningHour: eveningHour,
+            preferredLanguage: Self.appLanguageCode == "id" ? .indonesian : .english,
+            monthFirst: DateFormatter.dateFormat(fromTemplate: "Md", options: 0, locale: Formatting.locale)?.first == "M"
+        )
     }
 
     var parser: TaskParser {

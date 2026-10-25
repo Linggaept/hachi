@@ -108,7 +108,7 @@ final class CaptureModel: ObservableObject {
         guard !voice.isActive else { return }
         if mode == .form { mode = .quick }
         textBeforeVoice = text
-        Task { await voice.start() }
+        Task { await voice.start(language: settings.voiceLanguageCode) }
     }
 
     func stopVoice() {

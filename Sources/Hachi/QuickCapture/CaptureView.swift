@@ -29,7 +29,7 @@ struct CaptureView: View {
                 Image(systemName: "checklist")
                     .font(.system(size: 20, weight: .medium))
                     .foregroundStyle(.secondary)
-                TextField("Add a task… e.g. besok jam 3 sore call client", text: $model.text)
+                TextField("Add a task… e.g. tomorrow 3pm call client", text: $model.text)
                     .textFieldStyle(.plain)
                     .font(.system(size: 20))
                     .focused($focused)

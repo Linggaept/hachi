@@ -39,6 +39,11 @@ struct SettingsView: View {
                     Text(verbatim: "English").tag(AppLanguage.en)
                     Text(verbatim: "Bahasa Indonesia").tag(AppLanguage.id)
                 }
+                Picker("Voice language", selection: $settings.voiceLanguage) {
+                    Text("Follow app language").tag(AppLanguage.system)
+                    Text(verbatim: "English").tag(AppLanguage.en)
+                    Text(verbatim: "Bahasa Indonesia").tag(AppLanguage.id)
+                }
                 if settings.language != settings.launchLanguage {
                     HStack {
                         Text("Restart Hachi to use the new language.")

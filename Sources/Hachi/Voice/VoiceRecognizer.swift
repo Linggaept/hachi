@@ -17,7 +17,7 @@ final class VoiceRecognizer: ObservableObject {
     /// Teks sejauh ini (yang sudah pasti + yang masih berubah).
     @Published private(set) var transcript = ""
 
-    private let locale = Locale(identifier: "id_ID")
+    private var locale = Locale(identifier: "id_ID")
     private var engine: AVAudioEngine?
     private var finalized = ""
     private var volatile = ""
@@ -39,13 +39,15 @@ final class VoiceRecognizer: ObservableObject {
         }
     }
 
-    func start() async {
+    /// `language`: "id" atau "en". Bahasa Inggris memakai logat wilayah Mac bila tersedia, kalau tidak en_US.
+    func start(language: String) async {
         guard !isActive else { return }
         finalized = ""
         volatile = ""
         transcript = ""
         state = .preparing(String(localized: "Getting the microphone ready…"))
 
+        locale = await Self.locale(for: language)
         guard await Self.microphoneAllowed() else {
             state = .failed(String(localized: "Microphone access was denied. Open System Settings → Privacy & Security → Microphone."))
             return
@@ -113,7 +115,7 @@ final class VoiceRecognizer: ObservableObject {
     private func startOnDevice() async throws {
         let transcriber = DictationTranscriber(locale: locale, preset: .progressiveShortDictation)
         if let install = try await AssetInventory.assetInstallationRequest(supporting: [transcriber]) {
-            state = .preparing(String(localized: "Downloading the Indonesian speech model (one time only)…"))
+            state = .preparing(String(localized: "Downloading the speech model (one time only)…"))
             try await install.downloadAndInstall()
         }
         guard let format = await SpeechAnalyzer.bestAvailableAudioFormat(compatibleWith: [transcriber]) else {
@@ -200,6 +202,12 @@ final class VoiceRecognizer: ObservableObject {
         engine?.inputNode.removeTap(onBus: 0)
         engine?.stop()
         engine = nil
+    }
+
+    private static func locale(for language: String) async -> Locale {
+        guard language == "en" else { return Locale(identifier: "id_ID") }
+        let regional = Locale(identifier: "en_" + (Locale.current.region?.identifier ?? "US"))
+        return await DictationTranscriber.supportedLocale(equivalentTo: regional) ?? Locale(identifier: "en_US")
     }
 
     private static func microphoneAllowed() async -> Bool {

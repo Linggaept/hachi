@@ -6,7 +6,7 @@
 "%@ · in %@" = "%1$@ · %2$@ lagi";
 "%@ · now" = "%@ · sekarang";
 "Add a task…" = "Catat tugas…";
-"Add a task… e.g. besok jam 3 sore call client" = "Catat tugas… mis. besok jam 3 sore call client";
+"Add a task… e.g. tomorrow 3pm call client" = "Catat tugas… mis. besok jam 3 sore call client";
 "Afternoon (sore)" = "Sore";
 "All day" = "Seharian";
 "Already done" = "Sudah selesai";
@@ -23,7 +23,7 @@
 "Done" = "Selesai";
 "Done today (%lld)" = "Selesai hari ini (%lld)";
 "Done · last %lld days" = "Selesai · %lld hari terakhir";
-"Downloading the Indonesian speech model (one time only)…" = "Mengunduh model suara bahasa Indonesia (sekali saja)…";
+"Downloading the speech model (one time only)…" = "Mengunduh model suara (sekali saja)…";
 "Edit task" = "Ubah tugas";
 "Edit…" = "Ubah…";
 "Evening (malam)" = "Malam";
@@ -43,6 +43,7 @@
 "Good morning" = "Selamat pagi";
 "Got it" = "Mengerti";
 "Hachi can't open its database" = "Hachi tidak bisa membuka database";
+"Follow app language" = "Ikuti bahasa aplikasi";
 "Follow system" = "Ikuti sistem";
 "Hachi Settings" = "Pengaturan Hachi";
 "Has a date" = "Pakai tanggal";
@@ -114,6 +115,7 @@
 "Tomorrow" = "Besok";
 "Unsupported audio format" = "Format audio tidak didukung";
 "Upcoming" = "Akan datang";
+"Voice language" = "Bahasa suara";
 "Used when a sentence only says \"besok pagi\", \"nanti malam\", and so on. All-day task reminders use the morning time." = "Dipakai saat kalimat hanya menyebut \"besok pagi\", \"nanti malam\", dst. Pengingat tugas seharian memakai jam pagi.";
 "Welcome to Hachi" = "Selamat datang di Hachi";
 "Yesterday" = "Kemarin";
