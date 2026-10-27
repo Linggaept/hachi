@@ -8,6 +8,7 @@ final class SettingsState: ObservableObject {
     @Published var launchAtLogin = SMAppService.mainApp.status == .enabled
     @Published var loginError: String?
     @Published var notificationsDenied = false
+    @Published var accessibilityTrusted = DoubleTapOption.isTrusted
     @Published var dataMessage: String?
 }
 
@@ -33,6 +34,19 @@ struct SettingsView: View {
                 Text("Press to add a task, hold to speak.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                Toggle("Double-tap ⌥ to open the task list", isOn: $settings.doubleTapOption)
+                    .onChange(of: settings.doubleTapOption) { _, on in
+                        if on, !DoubleTapOption.isTrusted { DoubleTapOption.requestTrust() }
+                    }
+                if settings.doubleTapOption, !state.accessibilityTrusted {
+                    HStack {
+                        Text("Needs Accessibility permission. Turn on Hachi under Privacy & Security → Accessibility.")
+                            .font(.caption)
+                            .foregroundStyle(.orange)
+                        Spacer()
+                        Button("Accessibility…", action: openAccessibility)
+                    }
+                }
                 // Nama bahasa ditulis dalam bahasanya sendiri supaya tetap terbaca apa pun bahasa yang sedang dipakai.
                 Picker("Language", selection: $settings.language) {
                     Text("Follow system").tag(AppLanguage.system)
@@ -88,6 +102,7 @@ struct SettingsView: View {
                 HStack {
                     Button("Notification Settings…") { open("x-apple.systempreferences:com.apple.Notifications-Settings.extension") }
                     Button("Microphone…") { open("x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone") }
+                    Button("Accessibility…", action: openAccessibility)
                 }
             }
 
@@ -111,6 +126,12 @@ struct SettingsView: View {
         .formStyle(.grouped)
         .frame(width: 480, height: 700)
         .task { state.notificationsDenied = await scheduler.authorizationDenied() }
+        .onReceive(DistributedNotificationCenter.default().publisher(for: DoubleTapOption.trustChanged).delay(for: .seconds(1), scheduler: RunLoop.main)) { _ in
+            state.accessibilityTrusted = DoubleTapOption.isTrusted
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSWindow.didBecomeKeyNotification)) { _ in
+            state.accessibilityTrusted = DoubleTapOption.isTrusted
+        }
     }
 
     private func hourPicker(_ label: LocalizedStringKey, _ value: Binding<Int>, _ range: Range<Int>) -> some View {
@@ -131,6 +152,10 @@ struct SettingsView: View {
             state.loginError = String(localized: "Failed: \(error.localizedDescription). Make sure Hachi is in the Applications folder.")
         }
         state.launchAtLogin = SMAppService.mainApp.status == .enabled
+    }
+
+    private func openAccessibility() {
+        open("x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")
     }
 
     private func open(_ url: String) {

@@ -31,6 +31,8 @@ final class AppSettings: ObservableObject {
     private let defaults = UserDefaults.standard
 
     @Published var hotkey: HotkeyChoice { didSet { defaults.set(hotkey.rawValue, forKey: "hotkey") } }
+    /// Ketuk ⌥ dua kali membuka daftar tugas. Bawaan mati karena butuh izin Aksesibilitas.
+    @Published var doubleTapOption: Bool { didSet { defaults.set(doubleTapOption, forKey: "doubleTapOption") } }
     @Published var morningHour: Int { didSet { defaults.set(morningHour, forKey: "morningHour") } }
     @Published var noonHour: Int { didSet { defaults.set(noonHour, forKey: "noonHour") } }
     @Published var afternoonHour: Int { didSet { defaults.set(afternoonHour, forKey: "afternoonHour") } }
@@ -62,6 +64,7 @@ final class AppSettings: ObservableObject {
             "briefingEnabled": true, "briefingHour": 5, "nudgeEnabled": true, "voiceLanguage": AppLanguage.system.rawValue,
         ])
         hotkey = HotkeyChoice(rawValue: defaults.string(forKey: "hotkey") ?? "") ?? .optionSpace
+        doubleTapOption = defaults.bool(forKey: "doubleTapOption")
         morningHour = defaults.integer(forKey: "morningHour")
         noonHour = defaults.integer(forKey: "noonHour")
         afternoonHour = defaults.integer(forKey: "afternoonHour")

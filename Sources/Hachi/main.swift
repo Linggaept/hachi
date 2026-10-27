@@ -12,6 +12,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusBar: StatusBarController!
     private var settingsWindow: SettingsWindowController!
     private let hotkey = HotKey()
+    private let doubleTap = DoubleTapOption()
     private var bag: Set<AnyCancellable> = []
 
     // Tekan = buka catat cepat, tahan = langsung bicara.
@@ -55,6 +56,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             .sink { [weak self] choice in self?.hotkey.register(choice) }
             .store(in: &bag)
 
+        doubleTap.onDoubleTap = { [weak self] in self?.statusBar.toggle() }
+        settings.$doubleTapOption
+            .sink { [weak self] on in on ? self?.doubleTap.start() : self?.doubleTap.stop() }
+            .store(in: &bag)
+        // Izin Aksesibilitas yang baru diberi kadang belum terbaca monitor yang sudah terpasang.
+        DistributedNotificationCenter.default().publisher(for: DoubleTapOption.trustChanged)
+            .delay(for: .seconds(1), scheduler: RunLoop.main)
+            .sink { [weak self] _ in
+                guard let self, settings.doubleTapOption else { return }
+                doubleTap.start()
+            }
+            .store(in: &bag)
+
         Task {
             _ = await scheduler.requestAuthorization()
             scheduler.sync()
@@ -85,6 +99,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func hotkeyPressed() {
         guard !pressed else { return }
         pressed = true
+        doubleTap.interrupt()
         holding = false
         wasVisible = capture.isVisible
         if !wasVisible { capture.showNew() }

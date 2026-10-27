@@ -89,6 +89,8 @@ Input suara mendengarkan dalam bahasa tampilan Hachi. Kalau ingin bicara dalam b
 
 Klik ikon Shiba untuk melihat panel. Angka di sebelah ikon = jumlah tugas terlambat.
 
+Panel juga bisa dibuka dengan mengetuk <kbd>⌥</kbd> dua kali. Nyalakan dulu di Pengaturan; macOS akan meminta izin Aksesibilitas karena Hachi perlu mengenali tombol Option saat kamu berada di app lain.
+
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/panel-id-dark.png">
@@ -122,7 +124,7 @@ Data tersimpan di `~/Library/Application Support/Hachi/todo.sqlite`.
 Tidak butuh Xcode; cukup Command Line Tools.
 
 ```sh
-swift test               # test parser bahasa Indonesia
+swift test               # jalankan test
 ./scripts/install.sh     # build, pasang ke /Applications, jalankan ulang
 ./scripts/build-app.sh   # hanya merakit build/Hachi.app
 ./scripts/release.sh     # membuat build/Hachi-<versi>.zip untuk Releases

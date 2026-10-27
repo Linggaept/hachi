@@ -63,6 +63,7 @@ The interface follows your Mac's language (English or Indonesian). To use a diff
 | Set details by hand | <kbd>⌘ ↩</kbd> in the capture box opens a form for date, time, reminder, and repeat |
 | Cancel | <kbd>esc</kbd> |
 | See your list | Click the Shiba icon in the menu bar. The number next to it is how many tasks are overdue. |
+| Open the list from the keyboard | Double-tap <kbd>⌥</kbd>. Turn it on in Settings first; macOS asks for Accessibility permission because Hachi has to notice the Option key in other apps. |
 
 The shortcut can be changed in Settings.
 
@@ -122,7 +123,7 @@ Hachi has no server, no account, and no analytics. Tasks and settings are stored
 No Xcode needed, only the Command Line Tools.
 
 ```sh
-swift test               # run the parser tests
+swift test               # run the tests
 ./scripts/install.sh     # build, install to /Applications, and relaunch
 ./scripts/build-app.sh   # only assemble build/Hachi.app
 ./scripts/release.sh     # build and zip build/Hachi-<version>.zip

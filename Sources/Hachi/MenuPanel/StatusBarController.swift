@@ -63,7 +63,7 @@ final class StatusBarController: NSObject {
         item.button?.toolTip = overdue > 0 ? String(localized: "Overdue: \(overdue)") : "Hachi"
     }
 
-    @objc private func toggle() {
+    @objc func toggle() {
         popover.isShown ? close() : show()
     }
 
